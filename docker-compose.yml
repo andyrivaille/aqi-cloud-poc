@@ -1,0 +1,32 @@
+services:
+  database:
+    image: postgres:16
+    container_name: aqi-postgres
+    environment:
+      POSTGRES_DB: aqi_db
+      POSTGRES_USER: aqi_user
+      POSTGRES_PASSWORD: aqi_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - postgres_data:/var/lib/postgresql/data
+
+  api:
+    build: ./api
+    container_name: aqi-api
+    ports:
+      - "5000:5000"
+    depends_on:
+      - database
+
+  frontend:
+    build: ./frontend
+    container_name: aqi-frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:
